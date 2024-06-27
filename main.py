@@ -38,7 +38,27 @@ def get_words():
   words = requests.get("https://api.shadiao.pro/chp")
   if words.status_code != 200:
     return get_words()
-  return words.json()['data']['text']
+  
+  words = words.json()['data']['text']
+  if len(words) > 120:
+    return get_words()
+  words1 = words
+  words2 = ''
+  words3 = ''
+  words4 = ''
+  words5 = ''
+  words6 = ''
+  if len(words) > 20:
+        words1 = words[:20]
+        words2 = words[20:]
+        if len(words2) > 20:
+          words3 = words2[:20]
+          words4 = words2[20:]
+          if len(words4) > 20:
+            words5 = words4[:20]
+            words6 = words4[20:]
+
+  return words1,words2,words3,words4,words5,words6
 
 def get_random_color():
   return "#%06x" % random.randint(0, 0xFFFFFF)
@@ -48,7 +68,12 @@ client = WeChatClient(app_id, app_secret)
 
 wm = WeChatMessage(client)
 wea, temperature,lowTemp,highTemp = get_weather()
-data = {"weather":{"value":wea},"city":{"value":city},"temperature":{"value":temperature},"lowest":{"value":lowTemp},"highest":{"value":highTemp},"love_days":{"value":get_count()},"birthday_left":{"value":get_birthday()},"words":{"value":get_words(), "color":get_random_color()}}
+words1,words2,words3,words4,words5,words6 = get_words();
+data = {"weather":{"value":wea},"city":{"value":city},"temperature":{"value":temperature},"lowest":{"value":lowTemp},
+        "highest":{"value":highTemp},"love_days":{"value":get_count()},"birthday_left":{"value":get_birthday()},
+        "words1":{"value":words1},"words2":{"value":words2},"words3":{"value":words3},"words4":{"value":words4},
+        "words5":{"value":words5},"words6":{"value":words6}
+        }
 for user_id in user_ids:
   res = wm.send_template(user_id, template_id, data)
   print(res)
